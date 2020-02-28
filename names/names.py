@@ -175,22 +175,25 @@ class BinarySearchTree:
         firstLetter1 = v1[0]
         firstLetter2 = v2[0]
 
-        fl1Value = -1
+        if firstLetter1 == firstLetter2:
+            return True
+            #if (len(v1) == 1 or len(v2) == 1):
+            #    return True
+            #return self.isGreater(v1[1:], v2[1:])
+
+        fl1Index = -1
         fl2Value = -1
         node = self.abcs.head
         while node:
             if firstLetter1 == node.value:
-                fl1Value = node.index
+                fl1Index = node.index
             if firstLetter2 == node.value:
                 fl2Value = node.index
             node = node.next
-            if fl2Value != -1 and fl1Value != -1:
+            if fl2Value != -1 and fl1Index != -1:
                 break
-
-        if fl1Value == fl2Value:
-            return self.isGreater(v1[1:], v2[1:])
-        
-        if fl1Value > fl2Value:
+   
+        if fl1Index > fl2Value:
             return True
         if firstLetter1 < firstLetter2:
             return False
@@ -198,29 +201,33 @@ class BinarySearchTree:
 
     # Insert the given value into the tree
     def insert(self, value):
-        if self.isGreater(self.value, value):
-            if self.left == None:
-                self.left = BinarySearchTree(value)
-                return
-            self.left.insert(value)
-        else:
-            if self.right == None:
-                self.right = BinarySearchTree(value)
-                return
-            self.right.insert(value)
+        tree = self
+        while True:
+            if tree.isGreater(value, tree.value):
+                if tree.right == None:
+                    tree.right = BinarySearchTree(value)
+                    break
+                tree = tree.right
+            else:
+                if tree.left == None:
+                    tree.left = BinarySearchTree(value)
+                    break
+                tree = tree.left
+
 
     # Return True if the tree contains the value
     # False if it does not
     def contains(self, target):
-        if self.value == target:
-            return True
-        elif self.value > target:
-            if self.left != None:
-                return self.left.contains(target)
-        elif self.value <= target:
-            if self.right != None:
-                return self.right.contains(target)
+        tree = self
+        while tree:
+            if tree.value == target:
+                return True
+            elif tree.isGreater(target, tree.value):
+                tree = tree.right
+            else:
+                tree = tree.left
         return False
+
 
     # Return the maximum value found in the tree
     def get_max(self):
@@ -273,15 +280,30 @@ f.close()
 
 duplicates = []  # Return the list of duplicates in this data structure
 
-names_1_tree = BinarySearchTree(names_1[0])
-for i in range(1, len(names_1)):
-    names_1_tree.insert(names_1[i])
+def makeATree(myList):
+    tree = BinarySearchTree(myList[0])
+    for i in range(1, len(myList)):
+        tree.insert(myList[i])
+    return tree
+
+names_1_tree = makeATree(names_1)
+#names_2_tree = makeATree(names_2)
 
 # Replace the nested for loops below with your improvements
-for name_1 in names_1:
-    for name_2 in names_2:
-        if name_1 == name_2:
-            duplicates.append(name_1)
+#for name_1 in names_1:
+#    for name_2 in names_2:
+#        if name_1 == name_2:
+#            duplicates.append(name_1)
+
+
+for name in names_2:
+    if names_1_tree.contains(name):
+        duplicates.append(name)
+
+#for name in names_1:
+#    if names_2_tree.contains(name):
+#        duplicates.append(name)
+
 # RUNTIME OF THE STARTER CODE IS O(N^2) OR MORE ACCURATELY:
 # IF NAMES_1 IS N AND NAMES_2 IS T THE RUNTIME IS O(N * T)
 # IF THE READING FROM THE FILES IS COUNTED IN THE BIG O THEN
